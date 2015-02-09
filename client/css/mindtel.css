@@ -1,0 +1,22 @@
+.vertical-strut-50 {
+	height: 50px;
+}
+
+.vertical-strut-10 {
+	height: 10px;
+}
+
+.vertical-strut-20 {
+	height: 20px;
+}
+
+.margin-10 {
+	margin-left: 5px;
+	margin-right: 5px;
+}
+
+.section-heading {
+	font-variant: small-caps;
+	font-weight: bold;
+	color: #888;
+}

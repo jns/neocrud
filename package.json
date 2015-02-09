@@ -1,0 +1,16 @@
+{
+  "name": "MinDtel",
+  "version": "0.0.0",
+  "description": "A simple web application for building neo4j graphs.",
+  "main": "neoserver.js",
+  "repository": "",
+  "author": "Joshua Shapiro <joshua.shapiro@gmail.com>",
+  "dependencies": {
+    "async": "~0.2.8",
+    "express": "~4.11.2",
+    "jade": "^1.9.1",
+    "socket.io": "~0.9.14",
+    "node-neo4j": "^2.0.1",
+    "sanitize-html": "^1.5.3"
+  }
+}

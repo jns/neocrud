@@ -1,0 +1,12 @@
+extends ./layout.jade
+
+block content
+    form#AddNodeForm(method="post" action="create")
+        .form-group
+            label(for="name") Name
+            input.form-control(type="text" name="name")
+        .form-group
+            label(for="labels") Labels
+            input.form-control(type="text" name="labels")
+        
+        button(type="submit" class="btn btn-default") Add

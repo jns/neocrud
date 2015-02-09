@@ -1,0 +1,16 @@
+extends ./layout.jade
+
+block content
+    .row
+        .col-md-12
+            #SearchMessage
+    .row
+        .col-md-12
+            table#SearchResults(class="table")
+                each row in result.data
+                    tr
+                        td
+                            a(href="/node/"+row[0])= row[2].name
+                            each label in row[1]
+                                span(class="label label-primary small")= label
+                                

@@ -1,0 +1,128 @@
+extends ./layout.jade
+
+block content
+    .well
+        span.lead= node.name 
+        each l in node.labels
+            span.label(class="label-primary small margin-10")= l
+    
+        h5.section-heading PROPERTIES
+            
+        dl#properties.dl-horizontal
+            each p in node.properties()
+                dt= p
+                dd= node[p]
+
+        h5.section-heading ADD A NEW PROPERTY
+        
+        form#addPropertyForm.form-inline
+            .form-group
+                input(type="hidden" name="nodeId" value=node._id)
+                label.sr-only(for="propertyName") Property
+                input.form-control(type="text" name="propertyName" placeholder="Property Name")
+                label.sr-only(for="propertyValue") Value
+                input.form-control(type="text" name="propertyValue" placeholder="Property Value")
+                a#addPropertyButton(class="btn btn-default") add
+        
+        .vertical-strut-20
+        
+        h5.section-heading RELATIONSHIPS
+        
+        table#relationshipTable.table
+            each r in node.relationships
+                tr
+                    if (r.direction === "in")
+                        td
+                            a(href=r.nodeId)= r.nodeName
+                    else
+                        td= node.name
+                    td= r.type
+                    if (r.direction === "out")
+                        td
+                            a(href=r.nodeId)= r.nodeName
+                    else
+                        td= node.name
+        
+        .vertical-strut-20
+        
+        h5.section-heading ADD A NEW RELATIONSHIP
+        table.table
+             tr   
+                td(colspan="2")
+                    form#addRelationshipForm.form-inline
+                        .form-group
+                            a#swapDirection.btn(class="btn-default")
+                                span.glyphicon(class="glyphicon-resize-horizontal")
+                            label.sr-only(for="relDirection")
+                            input(type="hidden" id="relDirection" name="relDirection" value="out")
+                            input(type="hidden" name="fromNodeId" value=node._id)
+                            label.sr-only(for="fromNodeName") From
+                            input.form-control(type="text" id="fromNodeName" name="fromNodeName" value=node.name readonly)
+                            label.sr-only(for="type") Type
+                            input.form-control(type="text" id="relType" name="relType" placeholder="Relationship")
+                            label.sr-only(for="node") To
+                            input.form-control(type="text" id="toNodeName" name="toNodeName" placeholder="Node")
+                            a#addRelationship(class="btn btn-default") add
+                    
+block finalScript
+    script.
+        var addRelationship = function(rel) { 
+            var nodeLink = $('<a/>').text(rel.nodeName).attr('href', rel.nodeId);
+            var relType = $('<td/>').text(rel.type);
+            var fromNode = $('<td/>');
+            var toNode = $('<td/>');
+            if (rel.direction == "in") {
+                fromNode.append(nodeLink);
+                toNode.text('#{node.name}');
+            } else {
+                fromNode.text('#{node.name}');
+                toNode.append(nodeLink);
+            }
+            var relRow = $('<tr/>').append(fromNode).append(relType).append(toNode);
+                $('#relationshipTable').append(relRow);      
+        }
+        
+        var addProperty = function(prop) {
+            var prop = $('<dt/>').text(prop.name);
+            var val = $('<dd/>').text(prop.value);
+            $('#properties').append(prop);
+            $('#properties').append(val);
+        };
+        
+        $('#swapDirection').click(function() { 
+            var direction = $('#relDirection');
+            var relControl = $('#relType');
+            var toNode = $('#toNodeName');
+            var fromNode = $('#fromNodeName');
+            if (direction.attr('value') == "out") { 
+                direction.attr('value', 'in');
+                toNode.insertBefore(relControl);
+                fromNode.insertAfter(relControl);
+            } else {
+                direction.attr('value', 'out');
+                fromNode.insertBefore(relControl);
+                toNode.insertAfter(relControl);
+            }
+            console.log("Direction is now " + direction.attr('value'));
+        });
+        
+        $('#addRelationship').click(function() { 
+            console.log("Adding Relationship...");
+            console.log($('#addRelationshipForm').serialize());
+            $.post('createRelationship', $('#addRelationshipForm').serialize(), function(data) {
+                addRelationship(data);
+            }).fail(function(jqXhr, status, error) {
+                alert(status + " error: " + error);
+            });;
+        });
+                            
+        $('#addPropertyButton').click(function() {
+            console.log("Adding Property...");
+            console.log($('#addPropertyForm').serialize());
+            $.post('set', $('#addPropertyForm').serialize(), function(data) {
+                console.log(data); 
+                addProperty(data);
+            }).fail(function(jqXhr, status, error) {
+                alert(status + " " + error);
+            });
+        });
