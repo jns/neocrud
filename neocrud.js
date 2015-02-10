@@ -139,25 +139,33 @@ router.post('/create', function(req, res, next) {
  * html -> redirect to show
  * json -> return data with success/fail status and errors
  */
-router.put('/update/:id');
+router.put('/update/:id', function(req, res, next) { 
+    console.log(req.body);
+});
 
 /**
  * POST /node/set
  * json -> Set the property of a node
  */
 router.post('/set', function(req, res, next) {
+    
+    console.log(req.body);
     var id = sanitizeHtml(req.body.nodeId);
     var prop = sanitizeHtml(req.body.propertyName);
-    var val = sanitizeHtml(req.body.propertyValue);
+    var val = req.body.propertyValue;
+    if (! /^\[.*\]$/.exec(val)) {
+        val = "'" + val + "'"; // Quote non-array types
+    }
     
     if (-1 == ['name', 'labels', 'relationships', 'properties'].indexOf(prop)) {
-        var cypher = "MATCH (n)  WHERE id(n)="+id + " SET n."+prop+"='"+val+"'";
+        var cypher = "MATCH (n)  WHERE id(n)="+id + " SET n."+prop+"="+ val;
         console.log(cypher);
         db.cypherQuery(cypher, function(err, result) {
             if (err) {
                 next(err);
-            }           
-            res.json({name: prop, value: val}).end();
+            } else {      
+                res.json({name: prop, value: val}).end();
+            }
         })
     } else {
         next(new Error('Invalid property name: ' + prop));

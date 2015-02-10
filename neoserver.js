@@ -27,7 +27,7 @@ function logErrors(err, req, res, next) {
 
 function clientErrorHandler(err, req, res, next) {
     if (req.xhr) { 
-        res.status(500).json({error: err.stack});
+        res.status(500).send(err.message);
     } else {
         next(err);
     }
@@ -35,7 +35,7 @@ function clientErrorHandler(err, req, res, next) {
 
 function errorHandler(err, req, res, next) { 
     res.status(500);
-    res.render('error', {error: err});
+    res.render('error', {error: err.message});
 }
 
 

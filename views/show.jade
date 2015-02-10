@@ -118,11 +118,19 @@ block finalScript
                             
         $('#addPropertyButton').click(function() {
             console.log("Adding Property...");
-            console.log($('#addPropertyForm').serialize());
-            $.post('set', $('#addPropertyForm').serialize(), function(data) {
+            
+            var values = {};
+            values.nodeId = $('#addPropertyForm input[name=nodeId]')[0].value;
+            values.propertyName = $('#addPropertyForm input[name=propertyName]')[0].value;
+            values.propertyValue = $('#addPropertyForm input[name=propertyValue]')[0].value;
+            
+            console.log(JSON.stringify(values));
+            
+            $.post('set', values, function(data) {
                 console.log(data); 
                 addProperty(data);
-            }).fail(function(jqXhr, status, error) {
-                alert(status + " " + error);
+            }).fail(function(error, status, message) {
+                console.log(message + " " + error.responseText);
+                alert( message + " " + error.responseText);
             });
         });
