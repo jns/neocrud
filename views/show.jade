@@ -2,10 +2,11 @@ extends ./layout.jade
 
 block content
     .well
-        span.lead= node.name 
+        span.lead!= node.name 
         each l in node.labels
-            span.label(class="label-primary small margin-10")= l
-    
+            a(href=labelquery(l))
+                span.label(class="label-primary small margin-10")= l
+                
         h5.section-heading PROPERTIES
             
         dl#properties.dl-horizontal
@@ -34,6 +35,9 @@ block content
                     if (r.direction === "in")
                         td
                             a(href=r.nodeId)= r.nodeName
+                            each l in r.labels
+                                a(href=labelquery(l))
+                                    span.label(class="label-primary small margin-10")= l
                     else
                         td= node.name
                     td= r.type
@@ -46,26 +50,48 @@ block content
         .vertical-strut-20
         
         h5.section-heading ADD A NEW RELATIONSHIP
-        table.table
-             tr   
-                td(colspan="2")
-                    form#addRelationshipForm.form-inline
-                        .form-group
+        form#addRelationshipForm.form-inline
+            .form-group
+                table
+                    tr
+                        td
                             a#swapDirection.btn(class="btn-default")
                                 span.glyphicon(class="glyphicon-resize-horizontal")
                             label.sr-only(for="relDirection")
                             input(type="hidden" id="relDirection" name="relDirection" value="out")
                             input(type="hidden" name="fromNodeId" value=node._id)
-                            label.sr-only(for="fromNodeName") From
-                            input.form-control(type="text" id="fromNodeName" name="fromNodeName" value=node.name readonly)
+                        td#Outbound
+                            #fromNodeGroup
+                                label.sr-only(for="fromNodeName") From
+                                input.form-control(type="text" id="fromNodeName" name="fromNodeName" value=node.name readonly)
+                        td
                             label.sr-only(for="type") Type
                             input.form-control(type="text" id="relType" name="relType" placeholder="Relationship")
-                            label.sr-only(for="node") To
-                            input.form-control(type="text" id="toNodeName" name="toNodeName" placeholder="Node")
+                        td#Inbound
+                            #toNodeGroup
+                                label.sr-only(for="node") To
+                                input.form-control(type="text" id="toNodeName" name="toNodeName" placeholder="Node")
+                        td
                             a#addRelationship(class="btn btn-default") add
                     
 block finalScript
     script.
+        $('#relType').typeahead({
+            hint: true,
+            highlight: true,
+            minLength: 1
+            }, {
+            name: 'relationshipcomplete',
+            displayKey: 'type',
+            source: relationshipcomplete.ttAdapter()
+        });
+        
+        $('#toNodeName').typeahead(null, {
+            name: 'nodecomplete', 
+            displayKey: 'name', 
+            source: nodecomplete.ttAdapter()
+        });
+        
         var addRelationship = function(rel) { 
             var nodeLink = $('<a/>').text(rel.nodeName).attr('href', rel.nodeId);
             var relType = $('<td/>').text(rel.type);
@@ -92,16 +118,20 @@ block finalScript
         $('#swapDirection').click(function() { 
             var direction = $('#relDirection');
             var relControl = $('#relType');
-            var toNode = $('#toNodeName');
-            var fromNode = $('#fromNodeName');
+            var toNode = $('#toNodeGroup');
+            var fromNode = $('#fromNodeGroup');
             if (direction.attr('value') == "out") { 
                 direction.attr('value', 'in');
-                toNode.insertBefore(relControl);
-                fromNode.insertAfter(relControl);
+                $('#Outbound').append(toNode);
+                $('#Inbound').append(fromNode);
+                // toNode.insertBefore(relControl);
+                // fromNode.insertAfter(relControl);
             } else {
                 direction.attr('value', 'out');
-                fromNode.insertBefore(relControl);
-                toNode.insertAfter(relControl);
+                $('#Outbound').append(fromNode);
+                $('#Inbound').append(toNode);
+                // fromNode.insertBefore(relControl);
+                // toNode.insertAfter(relControl);
             }
             console.log("Direction is now " + direction.attr('value'));
         });

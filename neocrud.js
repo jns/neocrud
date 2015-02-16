@@ -39,14 +39,14 @@ router.param('node', function(req, res, next, id) {
                 }
                 
                 req.node.labels = labels;
-                var relQuery = "MATCH (n)-[r]-(m) WHERE id(n)="+id+" RETURN type(r), m.name, id(m), id(startNode(r))";
+                var relQuery = "MATCH (n)-[r]-(m) WHERE id(n)="+id+" RETURN type(r), m.name, id(m), id(startNode(r)), labels(m)";
                 db.cypherQuery(relQuery, function(err, result) {
                     if (err) {
                         next();
                     }
                     result.data.forEach(function(row) {
                         var dir = (row[3] == id) ? 'out' : 'in'; 
-                        req.node.relationships.push({type: row[0], nodeName: row[1], nodeId: row[2], direction: dir});
+                        req.node.relationships.push({type: row[0], nodeName: row[1], nodeId: row[2], labels: row[4], direction: dir});
                     });
                     next();
                 })
@@ -57,19 +57,67 @@ router.param('node', function(req, res, next, id) {
     })
 })
 
-router.get('/search', function(req, res) { 
-    
-    if (null == req.query.q) { 
-        res.render('search');
+
+router.get('/relationships.json', function(req, res, next) {
+
+    db.readRelationshipTypes(function(err, result) {
+        if (err) {
+            next(err);
+        } else {
+            var objects = result.map(function(row) { return {"type": row}; });
+            console.log(JSON.stringify(objects));
+            res.json(objects);
+        }
+    })
+
+})
+
+
+router.get('/labels.json', function(req, res, next) {
+
+    db.listAllLabels(function(err, result) {
+        if (err) {
+            next(err);
+        } else {
+            var objects = result.map(function(row) { return {"name": row}; });
+            console.log(JSON.stringify(objects));
+            res.json(objects);
+        }
+    })
+
+})
+
+router.get('/nodeautocomplete.json', function(req, res, next) {
+    var query = req.query.q;
+   if (null != query) {
+        var cypher = "MATCH (n) WHERE n.name =~ \"(?i).*" + sanitizeHtml(query) + ".*\" RETURN n.name, id(n)";
+        console.log(cypher);
+        db.cypherQuery(cypher, function(err, results) {
+            if (err) {
+                next(err);
+            } else {
+                var objects = results.data.map(function(row) { return {"name": row[0], "id": row[1]}; });
+                console.log(JSON.stringify(objects));
+                res.json(objects);
+            }
+        })
     } else {
+        res.json([]);
+    }
+})
+
+router.get('/search', function(req, res, next) { 
     
-    var cypher = "MATCH (n) WHERE n.name =~ \"(?i).*" + sanitizeHtml(req.query.q) + ".*\" RETURN id(n), labels(n), n";
+    {
+  
+    var label= (req.query.l) ? ":"+req.query.l : "";
+  
+    var cypher = "MATCH (n"+label+") WHERE n.name =~ \"(?i).*" + sanitizeHtml(req.query.q) + ".*\" RETURN id(n), labels(n), n";
     console.log(cypher);
     db.cypherQuery(cypher, function(err, result) {
         if (err) {
-            throw err;
-        }
-        else {
+            next(err);
+        } else {
             if (req.xhr) {
                 res.json(result);
             }

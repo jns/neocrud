@@ -7,6 +7,14 @@ block content
             input.form-control(type="text" name="name")
         .form-group
             label(for="labels") Labels
-            input.form-control(type="text" name="labels")
+            input.form-control(class="typeahead" type="text" name="labels")
         
         button(type="submit" class="btn btn-default") Add
+        
+block finalScript
+    script.
+        $('#AddNodeForm :input[name=labels]').typeahead(null, {
+            name: 'labelcomplete',
+            displayKey: 'name',
+            source: labelcomplete.ttAdapter()
+        }); 

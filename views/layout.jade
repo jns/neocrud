@@ -5,6 +5,7 @@ html(lang="en")
         link(href="/css/bootstrap.min.css" rel="stylesheet")
         link(rel="stylesheet" href="/css/bootstrap-theme.min.css")
         link(rel="stylesheet" href="/css/mindtel.css")
+        link(rel="stylesheet" href="/css/typeahead.css")
     body
         .container
             .row
@@ -16,10 +17,8 @@ html(lang="en")
                         button#addNodeBtn(type="button" class="btn btn-default") New
                 #SearchBar(class="col-sm-12 col-md-6 col-md-offset-3 col-lg-4 col-lg-offset-6")
                     .input-group
-                        input#searchBox.form-control(
-                            type="search" 
-                            placeholder="Search" 
-                            name="q")
+                        #searchBox
+                            input.form-control(class="typeahead" type="text" placeholder="Search")
                         a#searchBtn.input-group-addon(
                             class="btn btn-default" 
                             aria-label="Search")
@@ -35,17 +34,23 @@ html(lang="en")
             
         script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js")
         script(src="/js/bootstrap.min.js")
+        script(src="/js/typeahead.bundle.js")
         script(src="/js/mindtel.js")
         script.
             $(document).ready(function() {
                 $('#searchBtn').click(function() { 
-                    window.location = '/node/search?' + $('#searchBox').serialize();
+                    window.location = '/node/search?q=' + $('#searchBtn').value;
                 });
                 
                 $('#addNodeBtn').click(function() {
                     window.location = 'new';
                 });
             });
-                            
+            
+            $('#searchBox .typeahead').typeahead(null, {
+                name: 'nodecomplete',
+                displayKey: 'name',
+                source: nodecomplete.ttAdapter()
+            });                
                             
         block finalScript             

@@ -13,9 +13,10 @@ app.use(logErrors);
 app.use(clientErrorHandler);
 app.use(errorHandler);
 
+app.locals.labelquery = function(l) { return "/node/search?l="+l; };
 
 function logRequests(req, res, next) { 
-    // console.log(req.method + " " + req.originalUrl);   
+    console.log(req.method + " " + req.originalUrl);   
     next();
 }
 
