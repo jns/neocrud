@@ -3,7 +3,7 @@ extends ./layout.jade
 block content
     .row
         .col-md-12
-            #SearchMessage
+            .message= SearchMessage
     .row
         .col-md-12
             table#SearchResults(class="table")
@@ -12,5 +12,6 @@ block content
                         td
                             a(href="/node/"+row[0])= row[2].name
                             each label in row[1]
-                                span(class="label label-primary small")= label
+                                a(href=labelquery(label))
+                                    span(class="label label-primary small")= label
                                 

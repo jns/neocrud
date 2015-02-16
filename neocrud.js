@@ -10,6 +10,15 @@ var router = express.Router();
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: false }));
 
+router.use(function(req, res, next) {
+    db.listAllLabels(function(err, result) {
+        if (! err) {
+            req.app.locals.labels = result;    
+        }
+        next();
+    })  
+});
+
 router.param('node', function(req, res, next, id) {
     
     console.log("Retrieving node " + id);
@@ -122,7 +131,7 @@ router.get('/search', function(req, res, next) {
                 res.json(result);
             }
             else {
-                res.render('search', {result: result});
+                res.render('search', {result: result, 'SearchMessage': "Found " + result.data.length + " nodes."});
             }
         }
     });
