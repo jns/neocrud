@@ -46,7 +46,7 @@ html(lang="en")
         script.
             $(document).ready(function() {
                 $('#searchBtn').click(function() { 
-                    window.location = '/node/search?q=' + $('#searchBox').value;
+                    window.location = '/node/search?q=' + $('#searchBox .typeahead').typeahead('val');
                 });
                 
                 $('#addNodeBtn').click(function() {
