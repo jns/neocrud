@@ -48,14 +48,14 @@ router.param('node', function(req, res, next, id) {
                 }
                 
                 req.node.labels = labels;
-                var relQuery = "MATCH (n)-[r]-(m) WHERE id(n)="+id+" RETURN type(r), m.name, id(m), id(startNode(r)), labels(m)";
+                var relQuery = "MATCH (n)-[r]-(m) WHERE id(n)="+id+" RETURN type(r), m.name, id(m), id(startNode(r)), labels(m), id(r)";
                 db.cypherQuery(relQuery, function(err, result) {
                     if (err) {
                         next();
                     }
                     result.data.forEach(function(row) {
                         var dir = (row[3] == id) ? 'out' : 'in'; 
-                        req.node.relationships.push({type: row[0], nodeName: row[1], nodeId: row[2], labels: row[4], direction: dir});
+                        req.node.relationships.push({type: row[0], id: row[5], nodeName: row[1], nodeId: row[2], labels: row[4], direction: dir});
                     });
                     next();
                 })
@@ -247,7 +247,7 @@ router.post('/createRelationship', function(req, res, next) {
     } else {
         relationship = "<" + relationship;
     }
-    var query = "MATCH (n) WHERE id(n)=" + fromNodeId + " MERGE (to {name: '" + toNodeName + "'}) MERGE (n)" + relationship + "(to)  RETURN type(r), to.name, id(to) ";
+    var query = "MATCH (n) WHERE id(n)=" + fromNodeId + " MERGE (to {name: '" + toNodeName + "'}) MERGE (n)" + relationship + "(to)  RETURN type(r), to.name, id(to), id(r) ";
     console.log(query);
     db.cypherQuery(query, function(err, result) { 
         if (err) {
@@ -255,9 +255,45 @@ router.post('/createRelationship', function(req, res, next) {
         }
         console.log(result);
         var row = result.data[0];
-        res.json({type: row[0], nodeName: row[1], nodeId: row[2], direction: direction});
+        res.json({type: row[0],id: row[3], nodeName: row[1], nodeId: row[2], direction: direction});
         
     });
+});
+
+/**
+ * Adds a label to a node
+ * query string should contain a key-value pair {l: "NewLabel"}
+ */
+router.put('/label/:id', function(req, res, next) {
+    var label = req.query.l;
+    if (label) {
+        db.addLabelsToNode(req.params.id, label, function(err, data) {
+            if (err) {
+                next(err);
+            } else {
+                if (data === true) {
+                    res.status(200).end();
+                } else {
+                    res.status(400).json({error: data}).end();
+                }
+            }
+        })
+    }
+});
+
+router.delete('/rel/:id', function(req, res, next) {
+   var id = req.params.id;
+   db.deleteRelationship(id, function(err, result) {
+        if (err) {
+            next(err);
+        } else {
+            if (result === true) {
+                res.status(200).end();
+            } else {
+                res.status(400).send("Error deleting relatinoship").end();
+            }
+        }
+   });
 });
 
 /**
@@ -265,6 +301,23 @@ router.post('/createRelationship', function(req, res, next) {
  * - html -> redirect with message
  * - json -> send message
  */
-router.delete('/:id');
+router.delete('/:id', function(req, res, next) {
+    var id = req.params.id;
+    console.log("Deleting node " + id);
+    db.deleteNode(id, function(err, node) {
+       if (err) {
+           console.log(err);
+           next(err);
+       } else {
+           if (node === true) {
+               console.log("Successfully deleted node " + id);
+               res.status(200).end();
+           } else {
+               console.log("Error deleting node " + id)
+               res.status(400).send("Error deleting node " + id).end();
+           }
+       }
+    });
+});
 
 module.exports = router;

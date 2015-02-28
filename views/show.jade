@@ -6,6 +6,7 @@ block content
         each l in node.labels
             a(href=labelquery(l))
                 span.label(class="label-primary small margin-10")= l
+        
                 
         h5.section-heading PROPERTIES
             
@@ -46,7 +47,8 @@ block content
                             a(href=r.nodeId)= r.nodeName
                     else
                         td= node.name
-        
+                    td 
+                        a(href="javascript:deleteRelationship("+r.id+")") delete
         .vertical-strut-20
         
         h5.section-heading ADD A NEW RELATIONSHIP
@@ -97,6 +99,9 @@ block finalScript
             var relType = $('<td/>').text(rel.type);
             var fromNode = $('<td/>');
             var toNode = $('<td/>');
+            var delLink = $('<a/>').text("delete").attr('href', 'javascript:deleteRelationship('+rel.id+')');
+
+            var delRel = $('<td/>').append(delLink);
             if (rel.direction == "in") {
                 fromNode.append(nodeLink);
                 toNode.text('#{node.name}');
@@ -104,15 +109,13 @@ block finalScript
                 fromNode.text('#{node.name}');
                 toNode.append(nodeLink);
             }
-            var relRow = $('<tr/>').append(fromNode).append(relType).append(toNode);
+            var relRow = $('<tr/>').append(fromNode).append(relType).append(toNode).append(delRel);
                 $('#relationshipTable').append(relRow);      
         }
         
         var addProperty = function(prop) {
-            var prop = $('<dt/>').text(prop.name);
-            var val = $('<dd/>').text(prop.value);
-            $('#properties').append(prop);
-            $('#properties').append(val);
+            $('#properties').append($('<dt/>').text(prop.name));
+            $('#properties').append($('<dd/>').text(prop.value));
         };
         
         $('#swapDirection').click(function() { 

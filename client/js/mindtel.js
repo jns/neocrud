@@ -36,6 +36,22 @@ var populateSearch = function (searchResults) {
     }
   };
 
+function deleteRelationship(id) {
+	$.ajax('rel/'+id, {method: 'DELETE'}).done(function() {
+		document.location.reload();
+	}).fail(function(error) {
+		alert(error.responseText);
+	});
+}
+
+function addLabel(id) {
+	
+	$.ajax('label/'+id+"?"+query, {method: "PUT"}).done(function(){
+		document.location.reload();	
+	}).fail(function(error){
+		alert(error.responseText);
+	})
+}
 
 // constructs the suggestion engine
 var nodecomplete = new Bloodhound({
