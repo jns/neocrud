@@ -164,7 +164,7 @@ router.get('/new', function(req, res) {
  * GET /node/edit/:id
  *   render edit form
  */
-router.get('/edit/:node([0-9])+', function(req, res) { 
+router.get('/edit/:node([0-9]+)', function(req, res) { 
   res.render('edit', {node: req.node});
 });
 
