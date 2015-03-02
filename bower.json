@@ -1,0 +1,28 @@
+{
+  "name": "NeoCrud",
+  "version": "0.0.1",
+  "authors": [
+    "shapiroj <joshua.shapiro@gmail.com>"
+  ],
+  "description": "NeoCrud App",
+  "main": "neoserver.js",
+  "moduleType": [
+    "node"
+  ],
+  "keywords": [
+    "neo4j"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "ckeditor": "~4.4.7"
+  },
+  "homepage": "https://github.com/jns/neocrud"
+}
