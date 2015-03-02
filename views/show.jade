@@ -13,7 +13,7 @@ block content
         dl#properties.dl-horizontal
             each p in node.properties()
                 dt= p
-                dd= node[p]
+                dd!= node[p]
 
         h5.section-heading ADD A NEW PROPERTY
         

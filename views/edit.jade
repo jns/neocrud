@@ -1,0 +1,32 @@
+extends ./layout.jade
+
+block jsLibraries
+    script(src="/bower_components/ckeditor/ckeditor.js")
+    
+block content
+    input#nodeId(type="hidden" name="node_id" value=node._id)
+    form#editNode
+        .form-group
+            label(for="name") Name
+            input.form-control(type="text" name="name" value=node.name)
+        .form-group
+            label(for="labels") Labels
+            input.form-control(type="text" name="labels" value=node.labels)
+        .form-group
+            label(for="notes") Notes
+            #notesEditor(name="notes" contenteditable="true")!= node.notes
+            
+        button#saveNode(class="btn btn-default") Save
+
+block finalScript
+    script.
+        $('#saveNode').click(function() {
+            var node = $('#editNode').serializeArray();
+            var nodeId = $('#nodeId')[0].value;
+            node.push({name: "notes", value: (CKEDITOR.instances.notesEditor.getData())});
+             $.post('/node/update/'+nodeId, node).done(function() {
+                document.location.reload();
+             }).fail(function(res) {
+                alert(res.responseText);
+             });
+        });

@@ -164,8 +164,8 @@ router.get('/new', function(req, res) {
  * GET /node/edit/:id
  *   render edit form
  */
-router.get('/edit/:id', function(req, res) { 
-  
+router.get('/edit/:node([0-9])+', function(req, res) { 
+  res.render('edit', {node: req.node});
 });
 
 /**
@@ -196,8 +196,21 @@ router.post('/create', function(req, res, next) {
  * html -> redirect to show
  * json -> return data with success/fail status and errors
  */
-router.put('/update/:id', function(req, res, next) { 
-    console.log(req.body);
+router.post('/update/:id', function(req, res, next) { 
+    
+    var id = req.params.id;
+    console.log("updating " +id);
+    db.updateNode(id, req.body, function(err, result) {
+        if (err) {
+            next(err);
+        } else {
+            if (result) {
+                res.status(200).end();
+            } else {
+                res.status(400).send("node " + id + " not found");
+            }
+        }
+    })
 });
 
 /**
