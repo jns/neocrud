@@ -12,6 +12,7 @@
     "socket.io": "~0.9.14",
     "node-neo4j": "^2.0.1",
     "sanitize-html": "^1.5.3",
-    "express-helpers": "^2.2.4"
+    "express-helpers": "^2.2.4",
+    "request": "^2.53.0"
   }
 }

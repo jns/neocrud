@@ -1,17 +1,20 @@
 var express = require('express');
 var neocrud = require('./neocrud');
 var path = require('path');
+var neo4j_proxy = require('./neo4j_proxy');
 var app = express();
 
 app.set('view engine', 'jade');
 app.set('views', './views');
 
 app.use(logRequests);
+app.use('/cypher', neo4j_proxy);
 app.use("/node", neocrud);
 app.use(express.static(path.resolve(__dirname, "client")));
 app.use(logErrors);
 app.use(clientErrorHandler);
 app.use(errorHandler);
+
 
 app.locals.labelquery = function(l) { return "/node/search?l="+l; };
 
