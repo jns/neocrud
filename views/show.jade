@@ -37,7 +37,7 @@ block content
                 tr
                     if (r.direction === "in")
                         td
-                            a(href=r.nodeId)= r.nodeName
+                            a(href=r.nodeId)!= r.nodeName
                             each l in r.labels
                                 a(href=labelquery(l))
                                     span.label(class="label label-primary small margin-10")= l
@@ -46,7 +46,7 @@ block content
                     td= r.type
                     if (r.direction === "out")
                         td
-                            a(href=r.nodeId)= r.nodeName
+                            a(href=r.nodeId)!= r.nodeName
                             each l in r.labels
                                 a(href=labelquery(l))
                                     span.label(class="label label-primary small margin-10")= l
