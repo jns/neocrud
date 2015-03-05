@@ -120,8 +120,9 @@ router.get('/search', function(req, res, next) {
     {
   
     var label= (req.query.l) ? ":"+req.query.l : "";
-  
-    var cypher = "MATCH (n"+label+") WHERE n.name =~ \"(?i).*" + sanitizeHtml(req.query.q) + ".*\" RETURN id(n), labels(n), n";
+    var name = (req.query.q) ? sanitizeHtml(req.query.q) : "";
+    
+    var cypher = "MATCH (n"+label+") WHERE n.name =~ \"(?i).*" + name + ".*\" RETURN id(n), labels(n), n";
     console.log(cypher);
     db.cypherQuery(cypher, function(err, result) {
         if (err) {
