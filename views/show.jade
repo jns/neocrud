@@ -1,12 +1,14 @@
 extends ./layout.jade
 
 block content
+    #nodeId= node._id
     .well
-        span.lead!= node.name 
-        each l in node.labels
-            a(href=labelquery(l))
-                span.label(class="label-primary small margin-10")= l
-        
+        span.lead!= node.name
+        #labels
+            each l in node.labels
+                a(href=labelquery(l))
+                    span.label(class="label-primary small margin-10")= l
+            #newLabel
                 
         h5.section-heading PROPERTIES
             
@@ -167,3 +169,5 @@ block finalScript
                 alert( message + " " + error.responseText);
             });
         });
+        
+        labelize($('#newLabel'), primaryNodeId());
