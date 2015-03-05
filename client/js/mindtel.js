@@ -52,6 +52,19 @@ function primaryNodeId() {
 		return undefined;
 	}
 }
+
+function setProperty(nodeId, propertyName, propertyValue) {
+	            
+    var values = {};
+    values.nodeId = nodeId;
+    values.propertyName = propertyName;
+    values.propertyValue = propertyValue;
+    
+    console.log(JSON.stringify(values));
+    
+    return $.post('/node/set', values);
+}
+
 	function labelize(element, forNode) {
 		if ( typeof forNode == undefined) {
 			return;

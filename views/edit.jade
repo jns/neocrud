@@ -16,16 +16,16 @@ block content
             label(for="notes") Notes
             #notesEditor(name="notes" contenteditable="true")!= node.notes
             
-        button#saveNode(class="btn btn-default") Save
+        a#saveNode(class="btn btn-default") Save
 
 block finalScript
     script.
         $('#saveNode').click(function() {
-            var node = $('#editNode').serializeArray();
             var nodeId = $('#nodeId')[0].value;
-            node.push({name: "notes", value: (CKEDITOR.instances.notesEditor.getData())});
-             $.post('/node/update/'+nodeId, node).done(function() {
-                document.location.reload();
+            var propertyName = "notes";
+            var propertyValue = CKEDITOR.instances.notesEditor.getData();
+            setProperty(nodeId, propertyName, propertyValue).done(function() {
+                document.location = "/node/" + nodeId;
              }).fail(function(res) {
                 alert(res.responseText);
              });
